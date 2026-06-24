@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>p5.js 字體編輯器</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.min.js"></script>
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="toolbar" style="overflow-y: auto; height: 100vh;">
+    <div id="edit-preview">
+      <div class="panel">
+        <div class="panel-title">Edit</div>
+        <div class="panel-box">
+          <div id="editingChar" class="char" contenteditable spellcheck="false">A</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">View</div>
+        <canvas id="previewCanvas" width="90" height="90"></canvas>
+      </div>
+    </div>
+    <div id="canvas-holder"></div>
+    <div class="controls-row">
+      <div class="control-item">
+        <button id="clear">Clear</button>
+      </div>
+      <div class="control-item">
+        <button id="export">Export font</button>
+      </div>
+    </div>
+
+    <hr>
+    <div class="control-group">
+      <h3>Grid settings</h3>
+      <div class="controls-row">
+        <div class="control-item">
+          <div class="slider-container">
+            <label>Grid columns: <span id="colsValue">10</span></label>
+            <input type="range" id="cols" min="4" max="100" value="10" class="slider">
+          </div>
+        </div>
+        <div class="control-item">
+          <div class="slider-container">
+            <label>Grid rows: <span id="rowsValue">16</span></label>
+            <input type="range" id="rows" min="4" max="100" value="16" class="slider">
+          </div>
+        </div>
+      </div>
+      <button id="updateGrid">Update grid</button>
+    </div>
+    <hr>
+    <div class="control-group">
+      <h3>Font settings</h3>
+      <div class="controls-row">
+        <div class="control-item">
+          <div class="slider-container">
+            <label>Font width: <span id="charWidthValue">600</span></label>
+            <input type="range" id="charWidth" min="200" max="2500" value="600" class="slider">
+          </div>
+        </div>
+        <div class="control-item">
+          <div class="slider-container">
+            <label>Font space: <span id="letterSpacingValue">0</span></label>
+            <input type="range" id="letterSpacing" min="-200" max="100" value="0" class="slider">
+          </div>
+        </div>
+      </div>
+      <div class="controls-row">
+        <div class="control-item">
+          <div class="slider-container">
+            <label>Font size: <span id="fontSizeValue">48</span>px</label>
+            <input type="range" id="fontSize" min="12" max="1000" value="48" class="slider">
+          </div>
+        </div>
+        <div class="control-item">
+          <div class="slider-container">
+            <label>Line height: <span id="lineHeightValue">1.2</span></label>
+            <input type="range" id="lineHeight" min="-2" max="3" value="1.2" step="0.1" class="slider">
+          </div>
+        </div>
+      </div>
+      <label>Enter text</label>
+      <textarea id="previewInput" placeholder="Enter sample text" rows="4"></textarea>
+    </div>
+    <hr>
+  </div>
+  <div id="editor">
+    <div id="displayArea">示例</div>
+  </div>
+  <script src="sketch.js"></script>
+  <script src="dance.js"></script>
+  <script>
+window.onload = () => {
+  const editDiv = document.getElementById('editingChar');
+  editDiv.addEventListener('input', e => {
+    if (window.handleEditCharInput) window.handleEditCharInput(e);
+  });
+  
+  // 更新滑塊值顯示
+  const sliders = ['cols', 'rows', 'charWidth', 'letterSpacing', 'fontSize', 'lineHeight'];
+  sliders.forEach(id => {
+    const slider = document.getElementById(id);
+    const valueDisplay = document.getElementById(id + 'Value');
+    slider.addEventListener('input', () => {
+      valueDisplay.textContent = slider.value;
+      if (window.handlePreviewSettings) window.handlePreviewSettings();
+    });
+  });
+
+  document.getElementById('clear').onclick = () => {
+    if (window.handleClear) window.handleClear();
+  };
+  document.getElementById('updateGrid').onclick = () => {
+    if (window.handleUpdateGrid) window.handleUpdateGrid();
+  };
+  document.getElementById('previewInput').addEventListener('input', () => {
+    if (window.handlePreviewInput) window.handlePreviewInput();
+  });
+  document.getElementById('export').onclick = () => {
+    if (window.handleExportFont) window.handleExportFont();
+  };
+  
+  if (window.placeCaretAtEnd) window.placeCaretAtEnd(editDiv);
+  if (window.updateDisplayArea) window.updateDisplayArea();
+};
+</script>
+</body>
+</html>
